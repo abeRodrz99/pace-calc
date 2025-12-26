@@ -58,14 +58,33 @@ function App() {
   const handleCopy = async () => {
     if (!results) return;
 
-    let text = `Pace Calculator Results\n`;
-    text += `${results.mainLabel}: ${results.mainMetric}\n`;
-    text += `Strategy: Negative Split\n\n`;
-    text += `Mile | Pace  | Elapsed\n`;
-    text += `----------------------\n`;
+    // 1. Get Total Distance (always from the input box)
+    const distDisplay = `${distance} ${unit}`;
 
+    // 2. Get Total Time
+    // If we calculated Pace, the Time is what the user entered.
+    // If we calculated Time, the Time is the result.
+    let timeDisplay = "";
+    if (calcMode === 'calculatePace') {
+        const h = parseInt(hrs) || 0;
+        const m = parseInt(mins) || 0;
+        const s = parseInt(secs) || 0;
+        const totalSecs = (h * 3600) + (m * 60) + s;
+        timeDisplay = formatTime(totalSecs);
+    } else {
+        timeDisplay = results.mainMetric;
+    }
+
+    // 3. Build the clean string
+    // Format: "5 mi - 46:40"
+    let text = `${distDisplay} : ${timeDisplay}\n`;
+    
+    // Add Splits
     results.splits.forEach(row => {
-      text += `${row.label.padEnd(4)} | ${row.pace.padEnd(5)} | ${row.elapsed}\n`;
+      // row.label is the mile number (e.g. "1")
+      // row.pace is the time (e.g. "9:33")
+      // Result: "1 - 9:33"
+      text += `${row.label} - ${row.pace}\n`;
     });
 
     try {
